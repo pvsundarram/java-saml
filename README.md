@@ -1,8 +1,56 @@
 # SAML Java Toolkit <!-- omit in toc -->
 
-[![Build Status](https://travis-ci.org/onelogin/java-saml.svg?branch=master)](https://travis-ci.org/onelogin/java-saml) [![Coverage Status](https://coveralls.io/repos/github/onelogin/java-saml/badge.svg?branch=master)](https://coveralls.io/github/onelogin/java-saml?branch=master)
-
 Add SAML support to your Java applications using this library.
+
+## This fork <!-- omit in toc -->
+
+This fork is modernized for current Java and Jakarta EE. See
+[`TODO.md`](TODO.md) for the work list and
+[`MODERNIZATION-LOG.md`](MODERNIZATION-LOG.md) for the detail.
+
+**Requirements: Java 21 or later** (built and tested on JDK 21 and JDK 25).
+
+Three changes here are **breaking** relative to upstream 2.9.x:
+
+1. **Jakarta EE 11.** `Auth` and `ServletUtils` now take
+   `jakarta.servlet.http.HttpServletRequest` / `HttpServletResponse` instead of
+   `javax.servlet.http.*`. Method signatures are otherwise unchanged, so
+   callers only update their own imports. Required for Tomcat 10+, Jetty 11+
+   and Spring Boot 3/4.
+2. **Java 21 baseline**, up from Java 8.
+3. **Security defaults now fail closed on SHA-1** (see below).
+
+### Changed security defaults <!-- omit in toc -->
+
+| Setting | Was | Now |
+|---|---|---|
+| `onelogin.saml2.security.signature_algorithm` | `rsa-sha1` | `rsa-sha256` |
+| `onelogin.saml2.security.digest_algorithm` | `sha1` | `sha256` |
+| `onelogin.saml2.security.reject_deprecated_alg` | `false` | `true` |
+
+SHA-1 is collision-broken in practice, so the toolkit no longer signs with it
+and no longer accepts inbound SHA-1 signatures by default. **If your IdP still
+signs with SHA-1**, your integration will start failing signature validation
+until you explicitly opt back in:
+
+```
+onelogin.saml2.security.reject_deprecated_alg = false
+```
+
+The right fix is to move the IdP to SHA-256; the opt-out is a bridge, not a
+destination.
+
+### Dependencies <!-- omit in toc -->
+
+All known advisories in the resolved dependency tree are cleared as of the last
+scan (previously 65 across the tree, including one critical). Notably xmlsec is
+on 4.0.4 (fixes [CVE-2023-44483](https://nvd.nist.gov/vuln/detail/CVE-2023-44483))
+and the optional Azure Key Vault chain is current (fixes
+[CVE-2026-33117](https://nvd.nist.gov/vuln/detail/CVE-2026-33117), critical).
+
+---
+
+## Upstream history <!-- omit in toc -->
 
 2.8.0 uses xmlsec 2.2.3 which fixes [CVE-2021-40690](https://snyk.io/vuln/SNYK-JAVA-ORGAPACHESANTUARIO-1655558)
 
@@ -157,12 +205,12 @@ java-saml (com.onelogin:java-saml-toolkit) has the following dependencies:
 * For CI:
   * org.jacoco:jacoco-maven-plugin
 
-also the [Java Cryptography Extension (JCE)](https://en.wikipedia.org/wiki/Java_Cryptography_Extension) is required. If you don't have it, download the version of [jce-8](http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html), unzip it, and drop its content at
-*${java.home}/jre/lib/security/*. JDK 9 and later offer the stronger cryptographic algorithms by default.
+Unlimited-strength cryptography is the default from JDK 9 onward, so no
+Java Cryptography Extension policy files need to be installed.
 
 *toolkit:*
 * com.onelogin:java-saml-core
-* javax.servlet:servlet-api
+* jakarta.servlet:jakarta.servlet-api
 
 *maven:*
 * org.apache.maven.plugins:maven-jar-plugin
@@ -205,7 +253,7 @@ In the repo, at *src/main/java* you will find the source; at *src/main/resources
 
 
 #### toolkit (com.onelogin:java-saml) ####
-This folder contains a maven project with the Auth class to handle the low level classes of java-saml-core and the ServletUtils class to handle javax.servlet.http objects, used on the Auth class.
+This folder contains a maven project with the Auth class to handle the low level classes of java-saml-core and the ServletUtils class to handle jakarta.servlet.http objects, used on the Auth class.
 In the repo, at *src/main/java* you will find the source and at *src/test/java* the junit tests for the classes Auth and ServletUtils.
 
 #### samples (com.onelogin:java-saml-tookit-samples) ####
@@ -488,9 +536,9 @@ Auth auth = new Auth(settings, request, response);
 #### The HttpRequest
 java-saml-core uses HttpRequest class, a framework-agnostic representation of an HTTP request.
 
-java-saml depends on javax.servlet:servlet-api, and the classes Auth and ServletUtils use HttpServletRequest and HttpServletResponse objects.
+java-saml depends on jakarta.servlet:jakarta.servlet-api, and the classes Auth and ServletUtils use HttpServletRequest and HttpServletResponse objects.
 
-If you want to use anything different than javax.servlet.http, you will need to reimplement Auth and ServletUtils based on that new representation of the HTTP request/responses.
+If you want to use anything different than jakarta.servlet.http, you will need to reimplement Auth and ServletUtils based on that new representation of the HTTP request/responses.
 
 #### Initiate SSO
 In order to send an AuthNRequest to the IdP:
