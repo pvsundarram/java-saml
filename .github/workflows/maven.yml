@@ -1,26 +1,49 @@
-# This workflow will build a Java project with Maven
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+# Builds and tests the toolkit with Maven.
+# https://docs.github.com/actions/guides/building-and-testing-java-with-maven
 
 name: java-saml CI with Maven
 
 on: [push, pull_request, workflow_dispatch]
 
+permissions:
+  contents: read
+
 jobs:
   test:
-
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        java: [ '8', '11' ]
+        # 21 is the compile baseline; 25 is the current LTS the artifacts must run on.
+        java: [ '21', '25' ]
         os: [ 'ubuntu-latest' ]
-    name: Java ${{ matrix.Java }} (${{ matrix.os }})
+    name: Java ${{ matrix.java }} (${{ matrix.os }})
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Java
-      uses: actions/setup-java@v2
-      with:
-        distribution: 'adopt'
-        java-version: ${{ matrix.java }}
-    - name: Maven Test
-      run: mvn --batch-mode clean verify org.jacoco:jacoco-maven-plugin:report
+      - uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.java }}
+          cache: 'maven'
+      - name: Maven Test
+        run: mvn --batch-mode -Ddependency-check.skip=true clean verify org.jacoco:jacoco-maven-plugin:report
+
+  # Dependency-check runs on its own so a slow or unavailable NVD feed cannot
+  # break the build matrix. Needs an NVD API key to be worth running.
+  dependency-check:
+    runs-on: ubuntu-latest
+    name: OWASP dependency-check
+    if: github.event_name != 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+      - name: Dependency check
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+        run: mvn --batch-mode verify -DskipTests -Dnvd.api.key="$NVD_API_KEY"

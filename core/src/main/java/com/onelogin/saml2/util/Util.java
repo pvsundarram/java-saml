@@ -646,7 +646,7 @@ public final class Util {
 	public static String convertToPem(X509Certificate certificate) {
 		String pemCert = "";
 		try {
-			Base64 encoder = new Base64(64);
+			Base64 encoder = Base64.builder().setLineLength(64).get();
 			String cert_begin = "-----BEGIN CERTIFICATE-----\n";
 			String end_cert = "-----END CERTIFICATE-----";
 

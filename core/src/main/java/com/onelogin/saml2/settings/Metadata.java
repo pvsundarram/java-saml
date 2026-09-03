@@ -342,7 +342,7 @@ public class Metadata {
 		List<X509Certificate> certs = Arrays.asList(certCurrent, certNew);
 		for(X509Certificate cert : certs) {
 		    if (cert != null) {
-	            Base64 encoder = new Base64(64);
+	            Base64 encoder = Base64.builder().setLineLength(64).get();
 	            byte[] encodedCert = cert.getEncoded();
 	            String certString = new String(encoder.encode(encodedCert));
 

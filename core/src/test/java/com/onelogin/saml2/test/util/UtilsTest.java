@@ -632,9 +632,13 @@ public class UtilsTest {
 	@Test
 	public void testGetNameIdDataWrongKey() throws Exception {
 		String keyString = Util.getFileAsString("data/misc/sp3.key");
-		
-		expectedEx.expect(Exception.class);
-		expectedEx.expectMessage("algid parse error, not a sequence");
+
+		// A malformed PKCS#8 key must be rejected rather than silently loaded.
+		// Assert on the exception type, not on the message: the JDK's wording for
+		// this condition changed after Java 8 ("algid parse error, not a sequence"
+		// became "Unable to decode key"), so matching the text pins the test to a
+		// specific JDK build.
+		expectedEx.expect(InvalidKeySpecException.class);
 		Util.loadPrivateKey(keyString);
 	}
 	

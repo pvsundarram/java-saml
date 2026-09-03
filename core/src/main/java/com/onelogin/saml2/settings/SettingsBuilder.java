@@ -3,6 +3,8 @@ package com.onelogin.saml2.settings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.Key;
 import java.security.KeyStore;
@@ -846,8 +848,10 @@ public class SettingsBuilder {
 
 		if (isString(propValue)) {
 			try {
-				return new URL(((String) propValue).trim());
-			} catch (MalformedURLException e) {
+				// URL(String) is deprecated as of Java 20. Going through URI also
+				// gets us RFC 3986 syntax validation, which URL never performed.
+				return new URI(((String) propValue).trim()).toURL();
+			} catch (MalformedURLException | URISyntaxException | IllegalArgumentException e) {
 				LOGGER.error("'{}' contains malformed url.", propertyKey, e);
 				return null;
 			}
