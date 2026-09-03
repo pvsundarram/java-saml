@@ -195,7 +195,7 @@ public final class Util {
 			 *       to a value, if people have issues with using the specified implementor. This would allow users to always
 			 *       override the implementation if they so need to.
 			 */
-			return XPathFactory.newInstance(XPathFactory.DEFAULT_OBJECT_MODEL_URI, "com.sun.org.apache.xpath.internal.jaxp.XPathFactoryImpl", java.lang.ClassLoader.getSystemClassLoader());
+			return secured(XPathFactory.newInstance(XPathFactory.DEFAULT_OBJECT_MODEL_URI, "com.sun.org.apache.xpath.internal.jaxp.XPathFactoryImpl", java.lang.ClassLoader.getSystemClassLoader()));
 		} catch (XPathFactoryConfigurationException e) {
 			LOGGER.debug("Error generating XPathFactory instance: " + e.getMessage(), e);
 		}
@@ -210,7 +210,29 @@ public final class Util {
 		 * -Djavax.xml.xpath.XPathFactory:http://java.sun.com/jaxp/xpath/dom=com.sun.org.apache.xpath.internal.jaxp.XPathFactoryImpl
 		 *
 		 */
-		return XPathFactory.newInstance();
+		return secured(XPathFactory.newInstance());
+	}
+
+	/**
+	 * Turns on secure processing for an XPathFactory, mirroring the hardening
+	 * already applied to the DocumentBuilderFactory in {@link #parseXML}. Among
+	 * other things this blocks access to external functions and extension
+	 * functions from within an XPath expression.
+	 *
+	 * @param factory
+	 * 				the factory to harden
+	 *
+	 * @return the same factory, with secure processing enabled where supported
+	 */
+	private static XPathFactory secured(XPathFactory factory) {
+		try {
+			factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+		} catch (Exception e) {
+			// Not every XPathFactory implementation supports the feature; the queries
+			// this class runs are all built-in constants, so carry on without it.
+			LOGGER.debug("Could not enable secure processing on the XPathFactory: " + e.getMessage(), e);
+		}
+		return factory;
 	}
 
 

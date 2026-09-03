@@ -157,8 +157,8 @@ public class SettingBuilderTest {
 		assertTrue(setting.getRequestedAuthnContext().isEmpty());
 		assertEquals("exact", setting.getRequestedAuthnContextComparison());
 		assertTrue(setting.getWantXMLValidation());
-		assertEquals(Constants.RSA_SHA1, setting.getSignatureAlgorithm());
-		assertEquals(Constants.SHA1, setting.getDigestAlgorithm());
+		assertEquals(Constants.RSA_SHA256, setting.getSignatureAlgorithm());
+		assertEquals(Constants.SHA256, setting.getDigestAlgorithm());
 		assertFalse(setting.getSignMetadata());
 
 		assertFalse(setting.isTrimNameIds());
@@ -216,8 +216,8 @@ public class SettingBuilderTest {
 		assertTrue(setting.getRequestedAuthnContext().isEmpty());
 		assertEquals("exact", setting.getRequestedAuthnContextComparison());
 		assertTrue(setting.getWantXMLValidation());
-		assertEquals(Constants.RSA_SHA1, setting.getSignatureAlgorithm());
-		assertEquals(Constants.SHA1, setting.getDigestAlgorithm());
+		assertEquals(Constants.RSA_SHA256, setting.getSignatureAlgorithm());
+		assertEquals(Constants.SHA256, setting.getDigestAlgorithm());
 		assertFalse(setting.getSignMetadata());
 		
 		assertFalse(setting.isTrimNameIds());
@@ -381,8 +381,8 @@ public class SettingBuilderTest {
 		assertTrue(setting.getRequestedAuthnContext().isEmpty());
 		assertEquals("exact", setting.getRequestedAuthnContextComparison());
 		assertTrue(setting.getWantXMLValidation());
-		assertEquals(Constants.RSA_SHA1, setting.getSignatureAlgorithm());
-		assertEquals(Constants.SHA1, setting.getDigestAlgorithm());
+		assertEquals(Constants.RSA_SHA256, setting.getSignatureAlgorithm());
+		assertEquals(Constants.SHA256, setting.getDigestAlgorithm());
 		assertFalse(setting.getSignMetadata());
 
 		Organization org = new Organization("SP Java", "SP Java Example", "http://sp.example.com");
@@ -436,8 +436,8 @@ public class SettingBuilderTest {
 		assertTrue(setting.getRequestedAuthnContext().isEmpty());
 		assertEquals("exact", setting.getRequestedAuthnContextComparison());
 		assertTrue(setting.getWantXMLValidation());
-		assertEquals(Constants.RSA_SHA1, setting.getSignatureAlgorithm());
-		assertEquals(Constants.SHA1, setting.getDigestAlgorithm());
+		assertEquals(Constants.RSA_SHA256, setting.getSignatureAlgorithm());
+		assertEquals(Constants.SHA256, setting.getDigestAlgorithm());
 		assertFalse(setting.getSignMetadata());
 
 		Organization org = new Organization("SP Java", "SP Java Example", "http://sp.example.com");
@@ -549,8 +549,8 @@ public class SettingBuilderTest {
 		assertTrue(setting.getRequestedAuthnContext().isEmpty());
 		assertEquals("exact", setting.getRequestedAuthnContextComparison());
 		assertTrue(setting.getWantXMLValidation());
-		assertEquals(Constants.RSA_SHA1, setting.getSignatureAlgorithm());
-		assertEquals(Constants.SHA1, setting.getDigestAlgorithm());
+		assertEquals(Constants.RSA_SHA256, setting.getSignatureAlgorithm());
+		assertEquals(Constants.SHA256, setting.getDigestAlgorithm());
 		assertTrue(setting.getSignMetadata());
 
 		assertNull(setting.getOrganization());
@@ -702,8 +702,8 @@ public class SettingBuilderTest {
 		assertTrue(setting2.getRequestedAuthnContext().isEmpty());
 		assertEquals("exact", setting2.getRequestedAuthnContextComparison());
 		assertTrue(setting2.getWantXMLValidation());
-		assertEquals(Constants.RSA_SHA1, setting2.getSignatureAlgorithm());
-		assertEquals(Constants.SHA1, setting2.getDigestAlgorithm());
+		assertEquals(Constants.RSA_SHA256, setting2.getSignatureAlgorithm());
+		assertEquals(Constants.SHA256, setting2.getDigestAlgorithm());
 		assertFalse(setting2.getSignMetadata());
 
 		assertFalse(setting.isTrimNameIds());

@@ -76,11 +76,16 @@ public class Saml2Settings {
 	private List<String> requestedAuthnContext = new ArrayList<>();
 	private String requestedAuthnContextComparison = "exact";
 	private boolean wantXMLValidation = true;
-	private String signatureAlgorithm = Constants.RSA_SHA1;
-	private String digestAlgorithm = Constants.SHA1;
+	// SHA-256 by default. SHA-1 is collision-broken in practice and must not be
+	// used for new signatures; both remain configurable for an IdP that still
+	// requires the old algorithms.
+	private String signatureAlgorithm = Constants.RSA_SHA256;
+	private String digestAlgorithm = Constants.SHA256;
 	private boolean rejectUnsolicitedResponsesWithInResponseTo = false;
 	private boolean allowRepeatAttributeName = false;
-	private boolean rejectDeprecatedAlg = false;
+	// Fail closed on inbound SHA-1 signatures. Override with
+	// onelogin.saml2.security.reject_deprecated_alg = false if an IdP still signs with SHA-1.
+	private boolean rejectDeprecatedAlg = true;
 	private String uniqueIDPrefix = null;
 
 	// Compress
